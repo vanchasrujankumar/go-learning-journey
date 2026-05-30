@@ -83,6 +83,108 @@ User Action → Handler → Repository → Publish Event to Kafka
 
 ---
 
+## 🗺️ Visual Architecture Overview
+
+### Full System Architecture
+
+```mermaid
+flowchart TB
+    subgraph Client[Client Layer]
+        REQ[HTTP Requests<br/>cURL / Postman / App]
+    end
+    
+    subgraph API[API Layer]
+        ROUTER[Chi Router]
+        MW[Middleware Stack<br/>Logger → Auth → CORS → Timeout]
+        HANDLER[Handler Functions<br/>Validate → Process → Respond]
+    end
+    
+    subgraph Business[Business Logic Layer]
+        REPO[Repository Pattern<br/>Abstracts Data Access]
+        SERIAL[Event Serialization<br/>JSON Marshal/Unmarshal]
+        VALID[Validation<br/>Struct Tags + Custom]
+    end
+    
+    subgraph Data[Data Layer]
+        MONGO[(MongoDB<br/>Primary Storage)]
+        MONGO_IDX[(Indexes<br/>email, sku)]
+    end
+    
+    subgraph Stream[Event Streaming]
+        KAFKA[Kafka Broker]
+        PROD[Producer<br/>Publish Events]
+        CONS[Consumer<br/>Process Events]
+    end
+    
+    subgraph Observability[Observability]
+        LOG[Structured Logging]
+        METRICS[Prometheus Metrics]
+        HEALTH[/health Endpoint]
+    end
+    
+    REQ -->|HTTP| ROUTER
+    ROUTER --> MW
+    MW --> HANDLER
+    HANDLER --> VALID
+    VALID --> REPO
+    REPO --> MONGO
+    MONGO -->|Indexes| MONGO_IDX
+    REPO -->|Post-CRUD| PROD
+    PROD -->|Event| KAFKA
+    KAFKA -->|Subscribe| CONS
+    CONS -->|Update| LOG
+    HANDLER --> HEALTH
+    HANDLER --> LOG
+    
+    style REQ fill:#4CAF50,color:white
+    style MONGO fill:#47A248,color:white
+    style KAFKA fill:#231F20,color:white
+    style PROD fill:#FF6F00,color:white
+    style CONS fill:#FF6F00,color:white
+```
+
+### Event Flow: Create → Kafka → Consumer
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Handler as User Handler
+    participant Repo as User Repository
+    participant DB as MongoDB
+    participant Prod as Kafka Producer
+    participant Broker as Kafka Broker
+    participant Cons as Kafka Consumer
+    
+    Client->>Handler: POST /api/v1/users
+    Handler->>Handler: Validate Request Body
+    Handler->>Handler: Hash Password
+    
+    Handler->>Repo: userRepo.Create(ctx, user)
+    Repo->>DB: collection.InsertOne()
+    DB-->>Repo: {UserID, InsertedID}
+    Repo-->>Handler: User with ID
+    
+    Handler->>Prod: Publish("user-events", event)
+    Prod->>Prod: json.Marshal(event)
+    Prod->>Broker: WriteMessages(topic, message)
+    Broker-->>Prod: ACK (after replica sync)
+    
+    Handler-->>Client: 201 Created + JSON
+    
+    Note over Cons: Background goroutine
+    loop Every 1s
+        Broker-->>Cons: FetchMessage
+        Cons->>Cons: json.Unmarshal → Event
+        Cons->>Cons: HandleUserEvent()
+        Cons->>Broker: CommitMessage
+        Broker->>Broker: Update Offset
+    end
+    
+    Cons->>Cons: Update cache / email / logs
+```
+
+---
+
 ## 🔑 Key Concepts Explained
 
 ### 1. Repository Pattern

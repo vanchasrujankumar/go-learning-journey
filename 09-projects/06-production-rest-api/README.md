@@ -138,6 +138,240 @@ make run
 
 ---
 
+## 📊 Visual Architecture
+
+### Request Lifecycle Flow
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant MW as Middleware Stack
+    participant R as Chi Router
+    participant H as Handler
+    participant S as Service/Repo
+    participant DB as MongoDB
+    participant K as Kafka
+
+    C->>MW: HTTP Request
+    MW->>MW: Logger Middleware
+    MW->>MW: Auth Middleware (JWT)
+    MW->>MW: CORS Middleware
+    MW->>MW: RequestID Middleware
+    MW->>R: Route Matched
+    
+    R->>H: Call Handler
+    H->>H: Validate Request Body
+    
+    alt Create/Update Operation
+        H->>S: userRepo.Create()
+        S->>DB: InsertOne()
+        DB-->>S: Inserted Result
+        S-->>H: User Object
+        H->>K: Publish Event
+        K-->>H: Ack
+    else Read Operation
+        H->>S: userRepo.GetByID()
+        S->>DB: FindOne()
+        DB-->>S: User Document
+        S-->>H: User Object
+    else Delete Operation
+        H->>S: userRepo.Delete()
+        S->>DB: DeleteOne()
+        DB-->>S: Deleted Count
+        S-->>H: Success
+        H->>K: Publish Delete Event
+    end
+    
+    H-->>C: JSON Response
+```
+
+### Kafka Event Streaming Architecture
+
+```mermaid
+flowchart TB
+    subgraph Services[Application Services]
+        API[REST API Handler]
+        REPO[Repository Layer]
+    end
+    
+    subgraph Kafka[Apache Kafka]
+        PROD[Producer]
+        BROKER[Kafka Broker]
+        CONS[Consumer]
+        TOPIC_USER[Topic: user-events]
+        TOPIC_PRODUCT[Topic: product-events]
+    end
+    
+    subgraph Storage[Data Storage]
+        MONGO[(MongoDB)]
+    end
+    
+    subgraph External[External Systems]
+        CACHE[Cache Layer]
+        LOG[Log Aggregator]
+        EMAIL[Email Service]
+        ANALYTICS[Analytics Platform]
+    end
+    
+    API -->|HTTP Request| REPO
+    REPO -->|CRUD Operations| MONGO
+    MONGO -->|Response| REPO
+    REPO -->|Event| PROD
+    
+    PROD -->|Publish| BROKER
+    BROKER --> TOPIC_USER
+    BROKER --> TOPIC_PRODUCT
+    BROKER -->|Deliver| CONS
+    
+    CONS -->|Process Event| CACHE
+    CONS -->|Process Event| LOG
+    CONS -->|Process Event| EMAIL
+    CONS -->|Process Event| ANALYTICS
+    
+    style API fill:#4CAF50,color:white
+    style REPO fill:#2196F3,color:white
+    style MONGO fill:#47A248,color:white
+    style BROKER fill:#231F20,color:white
+    style PROD fill:#FF6F00,color:white
+    style CONS fill:#FF6F00,color:white
+```
+
+### MongoDB CRUD Sequence
+
+```mermaid
+sequenceDiagram
+    participant H as HTTP Handler
+    participant R as UserRepository
+    participant DB as MongoDB
+    participant K as Kafka Producer
+
+    Note over H,R: CREATE User
+    H->>R: userRepo.Create(ctx, user)
+    R->>DB: collection.InsertOne(ctx, user)
+    DB-->>R: InsertOneResult
+    R-->>H: &User{ID: insertID}
+    H->>K: Publish "user.created" event
+
+    Note over H,R: READ User
+    H->>R: userRepo.GetByID(ctx, id)
+    R->>R: objectID := primitive.ObjectIDFromHex(id)
+    R->>DB: collection.FindOne(ctx, bson.M{"_id": objectID})
+    DB-->>R: SingleResult
+    R-->>H: &User{...}
+
+    Note over H,R: UPDATE User
+    H->>R: userRepo.Update(ctx, id, update)
+    R->>DB: collection.UpdateOne(ctx, filter, update)
+    DB-->>R: UpdateResult
+    R-->>H: Success/Error
+
+    Note over H,R: DELETE User
+    H->>R: userRepo.Delete(ctx, id)
+    R->>DB: collection.DeleteOne(ctx, filter)
+    DB-->>R: DeleteResult
+    R-->>H: Success/Error
+```
+
+### Middleware Chain
+
+```mermaid
+flowchart LR
+    REQ[HTTP Request] --> L[Logger]
+    L --> RI[RequestID]
+    RI --> AUTH[JWT Auth]
+    AUTH --> CORS[CORS]
+    CORS --> RL[Rate Limiter]
+    RL --> TIMEOUT[Timeout]
+    TIMEOUT --> HNDLR[Handler]
+    HNDLR --> RESP[JSON Response]
+    
+    subgraph Error[Error Handling]
+        TIMEOUT -.-> TIMEOUT_ERR[504 Timeout]
+        AUTH -.-> AUTH_ERR[401 Unauthorized]
+        RL -.-> RL_ERR[429 Too Many Requests]
+    end
+    
+    style REQ fill:#4CAF50,color:white
+    style RESP fill:#4CAF50,color:white
+    style HNDLR fill:#2196F3,color:white
+    style TIMEOUT_ERR fill:#f44336,color:white
+    style AUTH_ERR fill:#f44336,color:white
+    style RL_ERR fill:#f44336,color:white
+```
+
+### Producer-Consumer Event Flow
+
+```mermaid
+flowchart TB
+    subgraph Producer[Producer - Publish Event]
+        EVENT[Create Event Object] --> SERIALIZE[Serialize to JSON]
+        SERIALIZE --> WRITE[kafka.WriteMessages]
+        WRITE --> TOPIC{Topic Selection}
+        TOPIC -->|user-events| U_TOPIC[(user-events<br/>3 partitions)]
+        TOPIC -->|product-events| P_TOPIC[(product-events<br/>3 partitions)]
+    end
+    
+    subgraph Consumer[Consumer - Process Event]
+        U_TOPIC --> FETCH{kafka.FetchMessage}
+        P_TOPIC --> FETCH
+        FETCH --> DESERIALIZE[Unmarshal JSON]
+        DESERIALIZE --> ROUTE{Event Type}
+        ROUTE -->|user.created| UC[Handle Create]
+        ROUTE -->|user.updated| UU[Handle Update]
+        ROUTE -->|user.deleted| UD[Handle Delete]
+        ROUTE -->|product.*| PH[Handle Product Event]
+        UC --> COMMIT[Commit Offset]
+        UU --> COMMIT
+        UD --> COMMIT
+        PH --> COMMIT
+    end
+    
+    WRITE -->|Error| RETRY{Retry}
+    RETRY -->|3 attempts| WRITE
+    RETRY -->|Failed| DEAD[Dead Letter Queue]
+    
+    style EVENT fill:#FF6F00,color:white
+    style WRITE fill:#FF6F00,color:white
+    style U_TOPIC fill:#231F20,color:white
+    style P_TOPIC fill:#231F20,color:white
+    style FETCH fill:#FF6F00,color:white
+    style COMMIT fill:#4CAF50,color:white
+    style DEAD fill:#f44336,color:white
+```
+
+### Graceful Shutdown Flow
+
+```mermaid
+sequenceDiagram
+    participant S as Server
+    participant OS as OS Signal
+    participant HC as HTTP Server
+    participant DB as MongoDB
+    participant K as Kafka
+    
+    Note over S: Running normally
+    OS->>S: SIGINT/SIGTERM
+    S->>S: Create shutdown context (30s timeout)
+    
+    S->>HC: server.Shutdown(ctx)
+    HC->>HC: Stop accepting new connections
+    HC->>HC: Drain active connections
+    
+    S->>K: consumer.Close()
+    K-->>S: Consumer stopped
+    
+    S->>K: producer.Close()
+    K-->>S: Producer flushed & closed
+    
+    S->>DB: mongo.Close(ctx)
+    DB-->>S: Disconnected
+    
+    HC-->>S: Server shut down gracefully
+    S-->>OS: All resources cleaned up
+```
+
+---
+
 ## 📚 Key Concepts
 
 ### 1. REST API Design

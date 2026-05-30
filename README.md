@@ -3,8 +3,27 @@
 A comprehensive, structured learning path for mastering Go from beginner to intermediate level. This repository contains organized modules, practice exercises, and real-world projects.
 
 ## 📋 Table of Contents
+
+### 📚 Learning
 - [Project Structure](#project-structure)
 - [Learning Roadmap](#learning-roadmap)
+- [Prerequisites](#prerequisites)
+- [Learning Modules](#learning-modules)
+- [Practice Exercises](#practice-exercises)
+
+### 🚀 Projects
+- [Production REST API (Kafka + MongoDB)](09-projects/06-production-rest-api/README.md)
+- [CLI & Web Projects](#projects)
+
+### 🎯 Career Prep
+- [Interview Prep Guide](docs/INTERVIEW_PREP.md)
+- [Architecture Diagrams](docs/ARCHITECTURE.md)
+
+### ⚙️ Configuration
+- [Setup Guide](docs/SETUP.md)
+- [GitHub Actions & CI/CD](#github-actions--cicd)
+- [Resources & References](#resources--references)
+- [Progress Tracker](#progress-tracker)
 - [Prerequisites](#prerequisites)
 - [How to Use This Repository](#how-to-use-this-repository)
 - [Learning Modules](#learning-modules)
@@ -429,6 +448,40 @@ Located in `exercises/advanced/`:
 
 ---
 
+### Project 6: Production REST API with Kafka & MongoDB ⭐ **(Full Implementation)**
+**Duration**: 20-25 hours | **Status**: ✅ Complete
+
+**Features**:
+- Full REST API with Chi router (user/product CRUD)
+- MongoDB integration with repository pattern
+- Apache Kafka producer/consumer
+- Event-driven architecture
+- Docker & Docker Compose setup
+- Unit tests and implementation guide
+- Graceful shutdown, logging, error handling
+
+**Technologies**: Chi, MongoDB, Kafka, Docker, testing
+**Learning**: Production-grade Go, event streaming, databases
+
+**Project Directory**: `09-projects/06-production-rest-api/`
+- 📖 [Project README](09-projects/06-production-rest-api/README.md)
+- 📖 [Implementation Guide](09-projects/06-production-rest-api/IMPLEMENTATION_GUIDE.md)
+
+---
+
+## 🎯 Interview Preparation
+
+Ready to test your skills? Comprehensive interview prep guide with 37+ curated questions covering easy to medium difficulty:
+
+- 📖 [Go Interview Preparation Guide](docs/INTERVIEW_PREP.md) – Full prep with answers
+- ⭐ Easy questions: syntax, types, control flow, functions
+- ⭐⭐ Medium questions: interfaces, concurrency, testing, patterns
+- 💻 Coding challenges with LeetCode links
+- 📝 Mock interview tips and cheatsheets
+- 🔗 Pinpoint learning links for every topic
+
+---
+
 ## 📚 Resources & References
 
 ### Official Go Resources
@@ -487,14 +540,14 @@ Located in `exercises/advanced/`:
 ### Modules Progress
 | Module | Status | Completed | Notes |
 |--------|--------|-----------|-------|
-| 01 Basics | ⭕ Not Started | - | - |
-| 02 Data Types | ⭕ Not Started | - | - |
-| 03 Control Flow | ⭕ Not Started | - | - |
-| 04 Functions | ⭕ Not Started | - | - |
-| 05 Packages | ⭕ Not Started | - | - |
-| 06 Interfaces | ⭕ Not Started | - | - |
-| 07 Concurrency | ⭕ Not Started | - | - |
-| 08 Testing | ⭕ Not Started | - | - |
+| 01 Basics | ⭕ Not Started | - | Start here! |
+| 02 Data Types | ⭕ Not Started | - | Variables, collections |
+| 03 Control Flow | ⭕ Not Started | - | Loops, switch, defer |
+| 04 Functions | ⭕ Not Started | - | Methods, closures |
+| 05 Packages | ⭕ Not Started | - | go.mod, imports |
+| 06 Interfaces | ⭕ Not Started | - | Structs, embedding |
+| 07 Concurrency | ⭕ Not Started | - | Goroutines, channels |
+| 08 Testing | ⭕ Not Started | - | Benchmarks, coverage |
 
 ### Projects Progress
 | Project | Status | Completed | Notes |
@@ -504,6 +557,40 @@ Located in `exercises/advanced/`:
 | 3. Web Server | ⭕ Not Started | - | - |
 | 4. REST API | ⭕ Not Started | - | - |
 | 5. Task Processor | ⭕ Not Started | - | - |
+| 6. Production API | ✅ Complete | - | Full REST API + Kafka + MongoDB |
+
+---
+
+## 🔄 GitHub Actions & CI/CD
+
+This repository includes automated CI/CD pipelines to ensure code quality:
+
+### Workflow: Continuous Integration (`.github/workflows/ci.yml`)
+Triggered on every push and PR:
+- ✅ **Build & Test** – Go 1.21 and 1.22
+- ✅ **Lint** – golangci-lint code quality checks
+- ✅ **Format Check** – gofmt compliance
+- ✅ **Vet** – go vet static analysis
+- ✅ **Coverage** – Upload to Codecov
+
+### Workflow: Release (`.github/workflows/release.yml`)
+Triggered when a tag `v*.*.*` is pushed:
+- ✅ Build binaries for Linux, macOS (ARM64/Intel), Windows
+- ✅ Create GitHub Release with changelog
+- ✅ Build & push Docker image to GitHub Container Registry
+
+### Automation: Dependabot (`.github/dependabot.yml`)
+Weekly automated dependency checks:
+- ✅ Go modules (`gomod`) – weekly
+- ✅ Docker images (`docker`) – weekly
+- ✅ GitHub Actions (`github-actions`) – weekly
+
+### Automation: Renovate (`renovate.json`)
+- ✅ Auto-merges patch/minor updates (no emails)
+- ✅ Security updates merged immediately
+- ✅ Major updates require manual review
+
+**All configurations in `.github/` directory.**
 
 ---
 
