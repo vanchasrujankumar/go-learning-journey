@@ -15,7 +15,7 @@ type Product struct {
 	Stock       int32              `bson:"stock" json:"stock" validate:"required,gte=0"`
 	Category    string             `bson:"category" json:"category" validate:"required"`
 	Sku         string             `bson:"sku" json:"sku" validate:"required,unique"`
-	Status      string             `bson:"status" json:"status"`                    // available, out-of-stock, discontinued
+	Status      string             `bson:"status" json:"status"` // available, out-of-stock, discontinued
 	Tags        []string           `bson:"tags" json:"tags"`
 	Images      []Image            `bson:"images" json:"images"`
 	Metrics     ProductMetrics     `bson:"metrics" json:"metrics"`
@@ -26,29 +26,29 @@ type Product struct {
 
 // Image represents a product image
 type Image struct {
-	URL       string `bson:"url" json:"url"`
-	Alt       string `bson:"alt" json:"alt"`
-	Primary   bool   `bson:"primary" json:"primary"`
+	URL     string `bson:"url" json:"url"`
+	Alt     string `bson:"alt" json:"alt"`
+	Primary bool   `bson:"primary" json:"primary"`
 }
 
 // ProductMetrics represents product metrics
 type ProductMetrics struct {
-	Views      int32   `bson:"views" json:"views"`
-	Purchases  int32   `bson:"purchases" json:"purchases"`
-	Rating     float64 `bson:"rating" json:"rating"`
-	Reviews    int32   `bson:"reviews" json:"reviews"`
+	Views     int32   `bson:"views" json:"views"`
+	Purchases int32   `bson:"purchases" json:"purchases"`
+	Rating    float64 `bson:"rating" json:"rating"`
+	Reviews   int32   `bson:"reviews" json:"reviews"`
 }
 
 // CreateProductRequest is the request body for creating a product
 type CreateProductRequest struct {
-	Name        string  `json:"name" validate:"required,min=3"`
-	Description string  `json:"description" validate:"required,min=10"`
-	Price       float64 `json:"price" validate:"required,gt=0"`
-	Stock       int32   `json:"stock" validate:"required,gte=0"`
-	Category    string  `json:"category" validate:"required"`
-	Sku         string  `json:"sku" validate:"required"`
+	Name        string   `json:"name" validate:"required,min=3"`
+	Description string   `json:"description" validate:"required,min=10"`
+	Price       float64  `json:"price" validate:"required,gt=0"`
+	Stock       int32    `json:"stock" validate:"required,gte=0"`
+	Category    string   `json:"category" validate:"required"`
+	Sku         string   `json:"sku" validate:"required"`
 	Tags        []string `json:"tags"`
-	Images      []Image `json:"images"`
+	Images      []Image  `json:"images"`
 }
 
 // UpdateProductRequest is the request body for updating a product
