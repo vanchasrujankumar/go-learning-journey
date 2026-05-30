@@ -6,9 +6,9 @@ import "time"
 type EventType string
 
 const (
-	UserCreatedEvent   EventType = "user.created"
-	UserUpdatedEvent   EventType = "user.updated"
-	UserDeletedEvent   EventType = "user.deleted"
+	UserCreatedEvent    EventType = "user.created"
+	UserUpdatedEvent    EventType = "user.updated"
+	UserDeletedEvent    EventType = "user.deleted"
 	ProductCreatedEvent EventType = "product.created"
 	ProductUpdatedEvent EventType = "product.updated"
 	ProductDeletedEvent EventType = "product.deleted"

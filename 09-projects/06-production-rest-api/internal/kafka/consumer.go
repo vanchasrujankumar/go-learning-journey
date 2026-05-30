@@ -21,12 +21,12 @@ type MessageHandler func(ctx context.Context, message *kafka.Message) error
 // NewConsumer creates a new Kafka consumer
 func NewConsumer(brokers []string, topic, groupID string) *Consumer {
 	reader := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:         brokers,
-		Topic:           topic,
-		GroupID:         groupID,
-		StartOffset:     kafka.LastOffset,
-		MaxBytes:        10e6, // 10MB
-		CommitInterval:  1,
+		Brokers:                brokers,
+		Topic:                  topic,
+		GroupID:                groupID,
+		StartOffset:            kafka.LastOffset,
+		MaxBytes:               10e6, // 10MB
+		CommitInterval:         1,
 		PartitionWatchInterval: 0,
 	})
 
