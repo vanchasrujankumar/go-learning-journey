@@ -1,0 +1,120 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the coverage tool, specifically when used with LiterallyVersion or in CI/CD systems
+*.out
+
+# Dependency directories (remove the comment below to include it)
+vendor/
+
+# Go workspace file
+go.work
+
+# Golang IDE specific files
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# VS Code settings
+.vscode/
+*.code-workspace
+
+# GoLand settings
+.goland
+.goland.xml
+
+# Sublime Text settings
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+.vim/
+.swp
+.swo
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Linux
+.directory
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode
+.idea
+.goland
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build outputs
+/bin/
+/dist/
+*.o
+*.a
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Debug files
+*.dSYM/
+*.su
+*.gch
+
+# Go-specific
+*.cgo1.go
+*.cgo2.c
+_cgo_defun.c
+_cgo_gotypes.go
+_cgo_export.*
+
+# Profiling data
+*.prof
+*.pprof
+*.cpu
+*.mem
+
+# Database files (if used in projects)
+*.db
+*.sqlite
+*.sqlite3
+
+# Test coverage
+coverage/
+*.coverage

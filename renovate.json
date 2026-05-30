@@ -1,0 +1,102 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    ":dependencyDashboard",
+    ":semanticCommits"
+  ],
+  "automerge": true,
+  "automergeType": "pr",
+  "automergeStrategy": "squash",
+  "majorVersions": [
+    "node",
+    "go"
+  ],
+  "go": {
+    "automerge": true,
+    "automergeType": "pr",
+    "automergeStrategy": "squash",
+    "minimumReleaseAge": "3 days",
+    "rangeStrategy": "bump"
+  },
+  "npm": {
+    "automerge": false,
+    "rangeStrategy": "bump"
+  },
+  "docker": {
+    "automerge": true,
+    "automergeType": "pr",
+    "automergeStrategy": "squash",
+    "minimumReleaseAge": "5 days"
+  },
+  "packageRules": [
+    {
+      "description": "Automerge minor and patch updates for Go",
+      "matchDatasources": [
+        "golang-version"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash"
+    },
+    {
+      "description": "Automerge minor and patch updates for dependencies",
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "matchDatasources": [
+        "go"
+      ],
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash"
+    },
+    {
+      "description": "Require approval for major updates",
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "automerge": false
+    },
+    {
+      "description": "Automerge Docker image patch updates",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash"
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "labels": [
+      "security"
+    ],
+    "automerge": true,
+    "automergeType": "pr",
+    "automergeStrategy": "squash"
+  },
+  "prConcurrentLimit": 3,
+  "prCreationLimit": 5,
+  "semanticCommits": "enabled",
+  "commitMessagePrefix": "chore(deps): ",
+  "ignoreTests": false,
+  "labels": [
+    "dependencies",
+    "renovate"
+  ],
+  "assignees": [
+    "@SrujanKumar"
+  ],
+  "reviewers": [
+    "@SrujanKumar"
+  ]
+}

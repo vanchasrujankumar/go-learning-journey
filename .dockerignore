@@ -1,0 +1,48 @@
+# Docker Ignore file
+# Exclude unnecessary files from Docker build context
+
+# Git files
+.git
+.gitignore
+.gitattributes
+.github
+
+# IDEs
+.idea
+.vscode
+*.iml
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Go cache and build
+.cache
+bin/
+dist/
+vendor/
+*.test
+*.out
+
+# Documentation
+docs/
+*.md
+
+# Development
+.env
+.env.local
+node_modules/
+
+# OS files
+Thumbs.db
+ehthumbs.db
+.AppleDouble
+.LSOverride
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
