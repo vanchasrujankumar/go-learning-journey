@@ -275,37 +275,28 @@ graph TB
 ## 🌳 Module Difficulty & Time Tree
 
 ```mermaid
-mindmap
-  root((Go Learning<br/>56 hours))
-    ::icon(fa fa-book)
-    
-    Phase 1 - 14h
-      ::icon(fa fa-star)
-      [01: Basics 3h]
-      [02: Types 4h]
-      [03: Control 3h]
-      [04: Loops 4h]
-    
-    Phase 2 - 16h
-      ::icon(fa fa-star-half-alt)
-      [04: Functions 4h]
-      [05: Packages 4h]
-      [06: Interfaces 4h]
-      [06b: Structs 4h]
-    
-    Phase 3 - 26h
-      ::icon(fa fa-star)
-      [07: Concurrency 5h]
-      [08: Testing 4h]
-      [Project 1: CLI 5h]
-      [Project 2: Weather 5h]
-      [Project 3: Server 7h]
-    
-    Phase 4 - Advanced
-      ::icon(fa fa-trophy)
-      [REST API 20h]
-      [Task Processor 15h]
-      [Production API 25h]
+graph TD
+    root["Go Learning (56 hours)"]
+    root --> P1["Phase 1 - 14h"]
+    P1 --> B1["01: Basics 3h"]
+    P1 --> B2["02: Types 4h"]
+    P1 --> B3["03: Control 3h"]
+    P1 --> B4["04: Loops 4h"]
+    root --> P2["Phase 2 - 16h"]
+    P2 --> F1["04: Functions 4h"]
+    P2 --> F2["05: Packages 4h"]
+    P2 --> F3["06: Interfaces 4h"]
+    P2 --> F4["06b: Structs 4h"]
+    root --> P3["Phase 3 - 26h"]
+    P3 --> C1["07: Concurrency 5h"]
+    P3 --> C2["08: Testing 4h"]
+    P3 --> C3["Project 1: CLI 5h"]
+    P3 --> C4["Project 2: Weather 5h"]
+    P3 --> C5["Project 3: Server 7h"]
+    root --> P4["Phase 4 - Advanced"]
+    P4 --> R1["REST API 20h"]
+    P4 --> R2["Task Processor 15h"]
+    P4 --> R3["Production API 25h"]
 ```
 
 ## 💡 Concept Mastery Checklist
@@ -365,16 +356,6 @@ stateDiagram-v2
     Running --> Runnable: Preempted
     Running --> Done: Function returns
     Done --> [*]
-    
-    note right of Created
-        Goroutine is lightweight
-        ~4KB initial stack
-    end note
-    
-    note right of Running
-        M:N scheduling
-        Many goroutines to few OS threads
-    end note
 ```
 
 ### Channel Patterns

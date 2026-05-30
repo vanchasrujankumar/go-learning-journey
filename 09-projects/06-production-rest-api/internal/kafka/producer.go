@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 
 	"github.com/segmentio/kafka-go"
 )
@@ -16,11 +15,13 @@ type Producer struct {
 
 // NewProducer creates a new Kafka producer
 func NewProducer(brokers []string) *Producer {
+	dialer := &kafka.Dialer{
+		Timeout: 10,
+	}
 	writer := kafka.NewWriter(kafka.WriterConfig{
-		Brokers:      brokers,
-		Compression:  kafka.Snappy,
-		MaxAttempts:  3,
-		RequiredAcks: kafka.RequireAll, // Wait for all replicas
+		Brokers:     brokers,
+		Dialer:      dialer,
+		MaxAttempts: 3,
 	})
 
 	return &Producer{

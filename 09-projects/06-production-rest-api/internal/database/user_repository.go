@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // UserRepository handles user database operations
@@ -71,7 +72,7 @@ func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*models.
 
 // List retrieves all users with pagination
 func (r *UserRepository) List(ctx context.Context, skip, limit int64) ([]*models.User, error) {
-	opts := mongo.NewOptions().SetSkip(skip).SetLimit(limit)
+	opts := options.Find().SetSkip(skip).SetLimit(limit)
 	cursor, err := r.collection.Find(ctx, bson.M{}, opts)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list users: %w", err)

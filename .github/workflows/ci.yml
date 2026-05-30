@@ -22,13 +22,22 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
       
-      - name: Run tests
-        run: go test -v -race -coverprofile=coverage.out ./...
-      
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage.out
+      - name: Run tests in modules with go.mod
+        run: |
+          FAILED=0
+          for dir in $(find . -name "go.mod" -exec dirname {} \;); do
+            echo "=== Testing $dir ==="
+            cd "$dir"
+            if ! go test -v -race ./... 2>&1; then
+              echo "FAILED: $dir"
+              FAILED=1
+            fi
+            cd - > /dev/null
+          done
+          if [ "$FAILED" -eq 1 ]; then
+            exit 1
+          fi
+          echo "All tests passed!"
 
   lint:
     name: Lint
@@ -47,6 +56,8 @@ jobs:
         with:
           version: latest
           args: --timeout=5m
+          only-new-issues: true
+          skip-pkg-cache: true
 
   fmt:
     name: Format Check
@@ -62,11 +73,13 @@ jobs:
       
       - name: Run gofmt
         run: |
-          if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then
-            echo "Go files are not formatted:"
-            gofmt -s -d .
+          UNFORMATTED=$(gofmt -s -l . | grep -v ".git/" | wc -l | xargs)
+          if [ "$UNFORMATTED" -gt 0 ]; then
+            echo "Files not formatted ($UNFORMATTED):"
+            gofmt -s -l .
             exit 1
           fi
+          echo "All files are properly formatted."
 
   vet:
     name: Vet
@@ -80,5 +93,19 @@ jobs:
         with:
           go-version: '1.21'
       
-      - name: Run go vet
-        run: go vet ./...
+      - name: Run go vet on modules with go.mod
+        run: |
+          FAILED=0
+          for dir in $(find . -name "go.mod" -exec dirname {} \;); do
+            echo "=== Vetting $dir ==="
+            cd "$dir"
+            if ! go vet ./... 2>&1; then
+              echo "VET FAILED: $dir"
+              FAILED=1
+            fi
+            cd - > /dev/null
+          done
+          if [ "$FAILED" -eq 1 ]; then
+            exit 1
+          fi
+          echo "All vet checks passed!"

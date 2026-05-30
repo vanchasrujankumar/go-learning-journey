@@ -1,11 +1,9 @@
 package main
 
 import (
-	"context"
 	"testing"
 	"time"
 
-	"github.com/SrujanKumar/go-learning-journey/09-projects/06-production-rest-api/internal/database"
 	"github.com/SrujanKumar/go-learning-journey/09-projects/06-production-rest-api/internal/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
